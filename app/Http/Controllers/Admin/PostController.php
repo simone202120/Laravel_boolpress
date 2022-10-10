@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
 use PhpParser\Node\Stmt\Return_;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -38,7 +39,32 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title'=>'required|max:255',
+            'content'=>'required|max:65535'
+
+        ]);
+
+        $post=new Post();
+        $data= $request->all();
+        $post->fill($data);
+
+        $slug = Str::of($post->title, '-');
+
+        $counter = 1;
+        $checkPost = Post::where('slug', $slug)->first();
+
+        while($checkPost) {
+            $slug = Str::slug($post->title . '-' . $counter, '-');
+            $counter++;
+            $checkPost = Post::where('slug', $slug)->first();
+        }
+
+        $post->slug =$slug;
+        $post->save();
+
+        return redirect(view('admin.posts.index'))->with('status', 'Post Aggiunto');
+
     }
 
     /**

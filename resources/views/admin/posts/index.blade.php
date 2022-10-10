@@ -19,11 +19,11 @@
                         <td>{{$post->title}}</td>
                         <td>{{$post->slug}}</td>
                         <td>
-                        <a href="{{route('admin.posts.show', ['post'=>$post])}}" class="btn btn-primary">Visualizza</a>
-                        <a href="" class="btn btn-warning"> Modifica</a>
-                        <form action="submit" method="POST">
-                        <button type="button" class="btn btn-danger mt-1">Elimina</button>
-                        </form>
+                            <a href="{{route('admin.posts.show', ['post'=>$post])}}" class="btn btn-primary">Visualizza</a>
+                            <a href="" class="btn btn-warning">Modifica</a>
+                            <form action="submit" method="POST">
+                            <button type="button" class="btn btn-danger mt-1">Elimina</button>
+                            </form>
                         </td>
                     </tr>
                 @endforeach
