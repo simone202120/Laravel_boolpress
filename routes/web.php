@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,4 +27,9 @@ Route::middleware('auth')
     ->group(function (){
         Route::get('/', 'HomeController@index')
         ->name('home');
+        route::resource('posts','PostController');
     });
+
+Route::get("{any?}", function(){
+    return view('guest.home');
+})->where ('any', '.*');
