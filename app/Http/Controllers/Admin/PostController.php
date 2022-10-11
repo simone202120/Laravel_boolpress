@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
+use Illuminate\Auth\Events\Validated;
 use PhpParser\Node\Stmt\Return_;
 use Illuminate\Support\Str;
 
@@ -49,21 +50,13 @@ class PostController extends Controller
         $data= $request->all();
         $post->fill($data);
 
-        $slug = Str::of($post->title, '-');
+        $slug = $this->calculateSlug($post->title);
 
-        $counter = 1;
-        $checkPost = Post::where('slug', $slug)->first();
+        $post->slug = $slug;
 
-        while($checkPost) {
-            $slug = Str::slug($post->title . '-' . $counter, '-');
-            $counter++;
-            $checkPost = Post::where('slug', $slug)->first();
-        }
-
-        $post->slug =$slug;
         $post->save();
 
-        return redirect(view('admin.posts.index'))->with('status', 'Post Aggiunto');
+        return redirect()->route('admin.posts.index')->with('status', 'Post creato con successo!');
 
     }
 
@@ -84,9 +77,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
@@ -96,9 +89,43 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $request->validate([
+            'title'=>'required|max:255',
+            'content'=>'required|max:65535'
+
+        ]);
+
+        $data=$request->all();
+
+        if ($post->title !== $data['title']) {
+            $data['slug'] = $this->calculateSlug($data['title']);
+        }
+
+        $post->update($data);
+
+        return redirect()->route('admin.posts.index')->with('status', 'Post aggiornato con successo!');
+    }
+
+    protected function calculateSlug($title) {
+
+       
+        $slug = Str::slug($title, '-');
+
+        $checkPost = Post::where('slug', $slug)->first();
+
+        $counter = 1;
+
+        while($checkPost) {
+            $slug = Str::slug($title . '-' . $counter, '-');
+            $counter++;
+            $checkPost = Post::where('slug', $slug)->first();
+        }
+        
+
+        return $slug;
+
     }
 
     /**
@@ -107,8 +134,11 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+
+        return redirect()->route('admin.posts.index')->with('status', 'Cancellazione avvenuta con successo!');
     }
+    
 }

@@ -20,9 +20,11 @@
                         <td>{{$post->slug}}</td>
                         <td>
                             <a href="{{route('admin.posts.show', ['post'=>$post])}}" class="btn btn-primary">Visualizza</a>
-                            <a href="" class="btn btn-warning">Modifica</a>
-                            <form action="submit" method="POST">
-                            <button type="button" class="btn btn-danger mt-1">Elimina</button>
+                            <a href="{{route('admin.posts.edit', ['post'=>$post])}}" class="btn btn-warning">Modifica</a>
+                            <form method="POST" action="{{route('admin.posts.destroy', ['post' => $post->id])}}">
+                                @csrf
+                                @method('DELETE')
+                            <button  type="submit" class="btn btn-danger mt-1">Elimina</button>
                             </form>
                         </td>
                     </tr>
